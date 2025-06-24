@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz - Semestr 6</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; background: white; border-radius: 15px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); overflow: hidden; }
+        .header { background: linear-gradient(135deg, #2c3e50, #34495e); color: white; padding: 30px; text-align: center; }
+        .header h1 { font-size: 2.5em; margin-bottom: 10px; }
+        .quiz-selector { padding: 30px; background: #f8f9fa; border-bottom: 1px solid #dee2e6; }
+        .quiz-buttons { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-top: 20px; }
+        .quiz-btn { padding: 15px 20px; background: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; transition: all 0.3s ease; text-align: center; }
+        .quiz-btn:hover { background: #0056b3; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,123,255,0.3); }
+        .quiz-btn.active { background: #28a745; }
+        .quiz-content { padding: 30px; display: none; }
+        .quiz-content.active { display: block; }
+        .question-card { background: #fff; border: 1px solid #e9ecef; border-radius: 10px; padding: 25px; margin-bottom: 25px; box-shadow: 0 3px 10px rgba(0,0,0,0.1); }
+        .question-number { color: #6c757d; font-size: 14px; font-weight: bold; margin-bottom: 10px; }
+        .question-text { font-size: 18px; font-weight: 600; color: #2c3e50; margin-bottom: 20px; line-height: 1.6; word-wrap: break-word; }
+        .answers-list { list-style: none; }
+        .answer-item { margin-bottom: 12px; }
+        .answer-button { width: 100%; padding: 15px 20px; border: 2px solid #dee2e6; background: #fff; border-radius: 8px; cursor: pointer; font-size: 16px; text-align: left; transition: all 0.3s ease; color: #333; }
+        .answer-button:hover { border-color: #007bff; background: #f8f9fa; }
+        .answer-button.correct { background: #d4edda; border-color: #28a745; color: #155724; font-weight: 600; }
+        .answer-button.incorrect { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+        .show-answers-btn { background: #17a2b8; color: white; border: none; padding: 12px 25px; border-radius: 6px; cursor: pointer; font-size: 16px; margin-bottom: 20px; transition: background 0.3s ease; }
+        .show-answers-btn:hover { background: #138496; }
+        .loading { text-align: center; padding: 50px; font-size: 18px; color: #6c757d; }
+        .error { background: #f8d7da; color: #721c24; padding: 20px; border-radius: 8px; margin: 20px; text-align: center; }
+        .stats { background: #e9ecef; padding: 20px; border-radius: 8px; margin-bottom: 20px; text-align: center; }
+        .stats h3 { color: #2c3e50; margin-bottom: 10px; }
+        @media (max-width: 768px) { .quiz-buttons { grid-template-columns: 1fr; } .header h1 { font-size: 2em; } .question-text { font-size: 16px; } .answer-button { font-size: 14px; padding: 12px 15px; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎓 Quiz - Semestr 6</h1>
+            <p>Wybierz quiz i sprawdź swoją wiedzę</p>
+        </div>
+        <div class="quiz-selector">
+            <h2>Wybierz quiz:</h2>
+            <div class="quiz-buttons" id="quizButtons">
+                <div class="loading">Ładowanie quizów...</div>
+            </div>
+        </div>
+        <div id="quizContent" class="quiz-content"></div>
+    </div>
+
+    <script>
+        let quizData = null;
+        let currentQuiz = null;
+
+        async function loadQuizData() {
+            try {
+                console.log('Pobieranie danych quizu...');
+                const response = await fetch('https://adamdawi.github.io/Uni-quiz/assets/index-BTp0R0zT.js');
+                if (!response.ok) throw new Error(`Błąd HTTP ${response.status}: ${response.statusText}`);
+                const text = await response.text();
+                console.log('Pobrano dane, rozpoczynanie parsowania...');
+                const parsedData = parseQuizData(text);
+                console.log('Przetworzone dane quizów:', parsedData);
+                return parsedData;
+            } catch (error) {
+                console.error('Krytyczny błąd podczas ładowania danych quizu:', error);
+                throw error;
+            }
+        }
+        
+        function findAndParseZYByContent(jsContent) {
+            const uniqueString = "Dana jest struktura: struct Person";
+            const uniqueStringIndex = jsContent.indexOf(uniqueString);
+            if (uniqueStringIndex === -1) return null;
+
+            const startIndex = jsContent.lastIndexOf('[', uniqueStringIndex);
+            if (startIndex === -1) return null;
+
+            let openBrackets = 1;
+            let endIndex = -1;
+            for (let i = startIndex + 1; i < jsContent.length; i++) {
+                if (jsContent[i] === '[') openBrackets++;
+                else if (jsContent[i] === ']') openBrackets--;
+                if (openBrackets === 0) {
+                    endIndex = i;
+                    break;
+                }
+            }
+            if (endIndex === -1) return null;
+
+            const arrayStr = jsContent.substring(startIndex, endIndex + 1);
+            try {
+                const result = new Function('return ' + arrayStr)();
+                console.log(`✅ Sukces! Specjalna metoda znalazła i sparsowała quiz 'ZY' (${result.length} pytań).`);
+                return result;
+            } catch (e) {
+                console.error("Błąd parsowania quizu 'ZY' znalezionego specjalną metodą:", e);
+                return null;
+            }
+        }
+
+        function parseQuizData(jsContent) {
+            const quizzes = {};
+            const targetVars = ['WY', 'LY', 'vY', 'OY', 'KY', 'ZY', 'qY'];
+            
+            targetVars.forEach(varName => {
+                const pattern = new RegExp(`(?:const|let|var|,|^)\\s*${varName}\\s*=\\s*(\\[[\\s\\S]*?\\])(?=\\s*[,;]|$)`, 'm');
+                const match = pattern.exec(jsContent);
+                if (match && match[1]) {
+                    try {
+                        const result = new Function('return ' + match[1])();
+                        quizzes[varName] = result;
+                        console.log(`✅ Parsowanie '${varName}' powiodło się, znaleziono ${result.length} pytań.`);
+                    } catch (e) {
+                        console.error(`❌ Błąd parsowania danych dla '${varName}'.`);
+                    }
+                } else {
+                    console.warn(`❌ Standardowa metoda nie znalazła: '${varName}'`);
+                }
+            });
+
+            if (!quizzes['ZY']) {
+                const zyQuiz = findAndParseZYByContent(jsContent);
+                if (zyQuiz) quizzes['ZY'] = zyQuiz;
+            }
+            
+            return quizzes;
+        }
+
+        function getQuizInfo() {
+            return [{
+                title: "Semestr 6", courses: [
+                    { title: "Test", questions: "WY" },
+                    { title: "Integracja systemów", questions: "LY" },
+                    { title: "Interakcja człowiek-komputer", questions: "vY" },
+                    { title: "Zarządzanie bazami SQL i NoSQL", questions: "OY" },
+                    { title: "Android", questions: "KY" },
+                    { title: "IOS", questions: "ZY" },
+                    { title: "Szkielety", questions: "qY" }
+                ]
+            }];
+        }
+
+        function createQuizButtons() {
+            const buttonsContainer = document.getElementById('quizButtons');
+            buttonsContainer.innerHTML = '';
+            const quizInfo = getQuizInfo();
+            if (!quizData || Object.keys(quizData).length === 0) {
+                buttonsContainer.innerHTML = '<div class="error">❌ Nie znaleziono danych quizów.</div>';
+                return;
+            }
+            let foundQuizzes = 0;
+            quizInfo[0].courses.forEach(course => {
+                if (quizData[course.questions] && quizData[course.questions].length > 0) {
+                    const button = document.createElement('button');
+                    button.className = 'quiz-btn';
+                    button.textContent = `${course.title} (${quizData[course.questions].length} pytań)`;
+                    button.onclick = () => selectQuiz(course.questions, button);
+                    buttonsContainer.appendChild(button);
+                    foundQuizzes++;
+                }
+            });
+            if (foundQuizzes === 0) buttonsContainer.innerHTML = '<div class="error">❌ Nie udało się załadować żadnych quizów.</div>';
+        }
+
+        function selectQuiz(quizKey, clickedButton) {
+            currentQuiz = quizKey;
+            document.querySelectorAll('.quiz-btn').forEach(btn => btn.classList.remove('active'));
+            clickedButton.classList.add('active');
+            displayQuiz(quizData[quizKey], clickedButton.textContent.split(' (')[0]);
+        }
+        
+        // --- KLUCZOWA ZMIANA TUTAJ ---
+        function displayQuiz(questions, title) {
+            const content = document.getElementById('quizContent');
+            content.innerHTML = ''; // Wyczyść kontener przed dodaniem nowej treści
+            content.className = 'quiz-content active';
+            
+            const totalQuestions = questions.length;
+            
+            // Stworzenie bloku statystyk
+            const statsDiv = document.createElement('div');
+            statsDiv.className = 'stats';
+            statsDiv.innerHTML = `<h3>📊 Statystyki: ${title}</h3><p><strong>Pytania:</strong> ${totalQuestions}</p>`;
+            content.appendChild(statsDiv);
+
+            // Stworzenie przycisku "Pokaż odpowiedzi"
+            const showAnswersBtn = document.createElement('button');
+            showAnswersBtn.className = 'show-answers-btn';
+            showAnswersBtn.textContent = '🔍 Pokaż wszystkie poprawne odpowiedzi';
+            showAnswersBtn.onclick = revealAllAnswers;
+            content.appendChild(showAnswersBtn);
+
+            const questionsContainer = document.createElement('div');
+            questionsContainer.id = 'questionsContainer';
+            content.appendChild(questionsContainer);
+            
+            questions.forEach((question, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question-card';
+
+                const questionNumber = document.createElement('div');
+                questionNumber.className = 'question-number';
+                questionNumber.textContent = `Pytanie ${index + 1} z ${totalQuestions}`; // BEZPIECZNE
+                questionDiv.appendChild(questionNumber);
+
+                const questionTextElem = document.createElement('div');
+                questionTextElem.className = 'question-text';
+                questionTextElem.textContent = question.question || 'Brak treści pytania'; // BEZPIECZNE
+                questionDiv.appendChild(questionTextElem);
+
+                const answersList = document.createElement('ul');
+                answersList.className = 'answers-list';
+
+                (question.answers || []).forEach((answer, answerIndex) => {
+                    const li = document.createElement('li');
+                    li.className = 'answer-item';
+
+                    const button = document.createElement('button');
+                    button.className = 'answer-button';
+                    button.dataset.question = index;
+                    button.dataset.correct = !!answer.correct;
+                    button.textContent = `${String.fromCharCode(65 + answerIndex)}. ${answer.text || 'Brak treści odpowiedzi'}`; // BEZPIECZNE
+                    button.onclick = () => selectAnswer(button);
+                    
+                    li.appendChild(button);
+                    answersList.appendChild(li);
+                });
+
+                questionDiv.appendChild(answersList);
+                questionsContainer.appendChild(questionDiv);
+            });
+        }
+
+        function selectAnswer(button) {
+            const questionIndex = button.dataset.question;
+            const answerButtons = document.querySelectorAll(`.answer-button[data-question="${questionIndex}"]`);
+            answerButtons.forEach(btn => {
+                btn.classList.add(btn.dataset.correct === 'true' ? 'correct' : 'incorrect');
+                btn.disabled = true;
+                btn.style.cursor = 'default';
+            });
+        }
+
+        function revealAllAnswers() {
+            document.querySelectorAll('.answer-button').forEach(button => {
+                button.classList.add(button.dataset.correct === 'true' ? 'correct' : 'incorrect');
+                button.disabled = true;
+                button.style.cursor = 'default';
+            });
+        }
+
+        async function init() {
+            try {
+                quizData = await loadQuizData();
+                createQuizButtons();
+            } catch (error) {
+                document.getElementById('quizButtons').innerHTML = `<div class="error">❌ Błąd podczas ładowania danych quizu: ${error.message}</div>`;
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>

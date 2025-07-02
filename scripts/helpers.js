@@ -3,6 +3,18 @@ function soundPlay(sound) {
     newSound.play();
 }
 
+function createAudioPool(src, poolSize = 5) {
+    const pool = Array.from({ length: poolSize }, () => new Audio(src));
+    let index = 0;
+
+    return () => {
+        const sound = pool[index];
+        sound.currentTime = 0;
+        sound.play();
+        index = (index + 1) % poolSize;
+    };
+}
+
 function renderHearts(num) {
     lives.innerHTML = "";
     for (let i = 0; i < num; i++) {

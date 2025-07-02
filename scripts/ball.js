@@ -1,6 +1,6 @@
-const hitSound = new Audio('sounds/hit.wav');
-const fallBall = new Audio('sounds/fall.wav');
-const hitBrick = new Audio('sounds/hitBrick.wav');
+const playHit = createAudioPool('sounds/hit.wav');
+const playFall = createAudioPool('sounds/fall.wav');
+const playBrick = createAudioPool('sounds/hitBrick.wav');
 
 class Ball {
     constructor({
@@ -60,20 +60,20 @@ class Ball {
 
         if (leftEdge <= 1) {
             this.directionX = this.directionX * (-1)
-            this.soundPlay(hitSound)
+            playHit();
         }
         if (topEdge <= 1) {
             this.directionY = this.directionY * (-1)
-            this.soundPlay(hitSound)
+            playHit();
         }
         if (rightEdge >= canvasWidth - 1) {
             this.directionX = this.directionX * (-1)
-            this.soundPlay(hitSound)
+            playHit();
         }
         if (this.y + this.r > (canvas.height - (this.r * 2))) {
             this.directionX = 0
             this.directionY = 0
-            this.soundPlay(fallBall)
+            playFall();
             this.restart()
         }
     }
@@ -97,7 +97,7 @@ class Ball {
             this.directionX = Math.sin(bounceAngle) * this.speed;
             this.directionY = -Math.cos(bounceAngle) * this.speed;
 
-            this.soundPlay(hitSound);
+            playHit();
         }
     }
 
@@ -141,7 +141,7 @@ class Ball {
                     }
                 }
 
-                this.soundPlay(hitBrick);
+                playHit();
                 brick.colorpick -= 1
                 brick.lives -= 1
 

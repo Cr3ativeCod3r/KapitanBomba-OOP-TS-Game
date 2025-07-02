@@ -1,6 +1,6 @@
 function soundPlay(sound) {
-    sound.currentTime = 0;
-    sound.play();
+    const newSound = new Audio(sound.src);
+    newSound.play();
 }
 
 function renderHearts(num) {

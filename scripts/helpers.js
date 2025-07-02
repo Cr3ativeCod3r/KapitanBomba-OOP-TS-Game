@@ -1,3 +1,9 @@
+function isSmallDevice() {
+    return window.innerWidth < 768;
+}
+
+let soundEnabled = !isSmallDevice();
+
 function soundPlay(sound) {
     const newSound = new Audio(sound.src);
     newSound.play();
@@ -8,6 +14,7 @@ function createAudioPool(src, poolSize = 5) {
     let index = 0;
 
     return () => {
+        if (!soundEnabled) return;
         const sound = pool[index];
         sound.currentTime = 0;
         sound.play();

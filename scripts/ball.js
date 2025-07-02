@@ -1,6 +1,7 @@
 const playHit = createAudioPool('sounds/hit.wav');
-const playFall = createAudioPool('sounds/fall.wav');
+const playFall = new Audio('sounds/fall.wav');
 const playBrick = createAudioPool('sounds/hitBrick.wav');
+
 
 class Ball {
     constructor({
@@ -73,7 +74,7 @@ class Ball {
         if (this.y + this.r > (canvas.height - (this.r * 2))) {
             this.directionX = 0
             this.directionY = 0
-            playFall();
+            this.soundPlay(playFall)
             this.restart()
         }
     }

@@ -6,7 +6,7 @@ export class Player extends Entity {
 
     money: number = 0;
     monstersKilled: number = 0;
-    ammoSpeed: number = 10
+    ammoSpeed: number = 5
 
     constructor(
         x: number,
@@ -60,9 +60,9 @@ export class Player extends Entity {
 
         //bullet
         return [
-            new Bullet(this.x + 100, this.y + 25, 20, 10, this.ammoSpeed),
+            // new Bullet(this.x + 100, this.y + 25, 20, 10, this.ammoSpeed),
             new Bullet(this.x + 100, this.y + 50, 20, 10, this.ammoSpeed),
-            new Bullet(this.x + 100, this.y + 75, 20, 10, this.ammoSpeed)
+            // new Bullet(this.x + 100, this.y + 75, 20, 10, this.ammoSpeed)
           
         ];
     }

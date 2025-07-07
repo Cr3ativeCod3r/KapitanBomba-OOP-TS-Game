@@ -16,13 +16,15 @@ const bullets: Array<Bullet> = []
 const enemies: Array<Enemy> = []
 
 let player: Player;
-let enemyInterval = 2000;
+let enemyInterval = 1000;
 let enemyIntervalId: number | undefined;
 let gameIntervalId: number | undefined;
 let isGameOver = false;
 let enemyW = 100
 let enemyH = 100
 let correctionImages = 50;
+let enemylvl = 1
+let enemyLevelIntervalId: number | undefined;
 
 function initPlayer() {
     player = new Player(
@@ -99,7 +101,7 @@ function spawnEnemy() {
             enemyH,
             images.enemyKurvinox,
             1,
-            1,
+            enemylvl,
             1
         )
     );
@@ -139,22 +141,25 @@ function enemyCollisions() {
             let enemy = enemies[j];
 
             if (checkBulletEnemyCollision(bullet, enemy)) {
+                enemy.lives -= 1
                 if (enemy.damage > 0) {
                     // Tylko żywi wrogowie blokują pociski
                     bulletHitEnemy = true;
-
-                    // Sprawdź czy wróg ma zostać zamieniony na kupę (20% szans)
-                    if (Math.random() < 0.2) {
-                        enemy.damage = 0;
-                        enemy.speed = 0;
-                        enemy.image = images.poop;
-                    } else {
-                        // Usuń wroga i zwiększ licznik zabitych potworów
-                        enemies.splice(j, 1);
-                        player.monstersKilled += 1;
-                        updateMonstersKilled(player.monstersKilled);
+                    if (enemy.lives == 0) {
+                        // Sprawdź czy wróg ma zostać zamieniony na kupę (20% szans)
+                        if (Math.random() < 0.2) {
+                            enemy.damage = 0;
+                            enemy.speed = 0;
+                            enemy.image = images.poop;
+                        } else {
+                            // Usuń wroga i zwiększ licznik zabitych potworów
+                            enemies.splice(j, 1);
+                            player.monstersKilled += 1;
+                            updateMonstersKilled(player.monstersKilled);
+                        }
+                        break; // Pocisk może trafić tylko jednego wroga
                     }
-                    break; // Pocisk może trafić tylko jednego wroga
+
                 }
                 // Jeśli enemy.damage = 0 (kupa), pocisk przelatuje przez nią
             }
@@ -191,10 +196,21 @@ function startGameInterval() {
     }
     gameIntervalId = setInterval(() => {
         if (!isGameOver && enemyInterval > 200) {
-            enemyInterval = Math.max(200, enemyInterval - 200);
+            enemyInterval = Math.max(200, enemyInterval - 25);
             startEnemySpawner();
         }
     }, 10000);
+}
+
+function startEnemyLevelInterval() {
+    if (enemyLevelIntervalId !== undefined) {
+        clearInterval(enemyLevelIntervalId);
+    }
+    enemyLevelIntervalId = setInterval(() => {
+        if (!isGameOver && enemylvl < 6) {
+            enemylvl += 1;
+        }
+    }, 20000);
 }
 
 function gameOver() {
@@ -207,6 +223,10 @@ function gameOver() {
         clearInterval(gameIntervalId);
         gameIntervalId = undefined;
     }
+    if (enemyLevelIntervalId !== undefined) {
+        clearInterval(enemyLevelIntervalId);
+        enemyLevelIntervalId = undefined;
+    }
     enemies.length = 0;
     bullets.length = 0;
 }
@@ -214,6 +234,7 @@ function gameOver() {
 function restartGame() {
     enemyInterval = 2000;
     isGameOver = false;
+    enemylvl = 1;
 
     initPlayer();
     updatePoops(player.money);
@@ -223,8 +244,14 @@ function restartGame() {
     enemies.length = 0;
     bullets.length = 0;
 
+    if (enemyLevelIntervalId !== undefined) {
+        clearInterval(enemyLevelIntervalId);
+        enemyLevelIntervalId = undefined;
+    }
+
     startEnemySpawner();
     startGameInterval();
+    startEnemyLevelInterval();
 
     gameLoop();
 }
@@ -324,20 +351,21 @@ function updateShopProgressBars(levels: { [type: string]: number }) {
     });
 }
 
-function updateStatsBar(){
+function updateStatsBar() {
     updateShopProgressBars({
         ammo: 0,
         fasterShooting: player.ammoSpeed - 20,
         life: player.lives - 3,
         upgradeWeapon: 0
     });
-    
+
 }
 
 initPlayer();
 initShop();
 startEnemySpawner();
 startGameInterval();
+startEnemyLevelInterval();
 gameLoop();
 updateStatsBar()
 

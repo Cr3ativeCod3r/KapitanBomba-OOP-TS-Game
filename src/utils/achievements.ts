@@ -22,3 +22,10 @@ export function updatePoops(poops: number) {
         poopSpace.textContent = `${poops}`;
     }
 }
+
+export function updateAmmo(number: number) {
+    const ammoSpace = document.getElementById("ammo");
+    if (ammoSpace) {
+        ammoSpace.textContent = `${number}`;
+    }
+}

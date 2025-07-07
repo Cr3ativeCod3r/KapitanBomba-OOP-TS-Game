@@ -6,7 +6,7 @@ import { images } from "./assets/images";
 import { playerKey } from "./utils/control"
 import { playSound } from "./utils/soundPlayer";
 import { updateMonstersKilled } from "./utils/achievements"
-import { updateLives, updatePoops } from "./utils/achievements"
+import { updateLives, updatePoops, updateAmmo } from "./utils/achievements"
 import { drawGameOverScreen, restartButton } from "./scenes/gameOver";
 
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
@@ -37,6 +37,7 @@ function initPlayer() {
         3
     );
     updateLives(player.lives)
+    updateAmmo(player.ammos)
     updateMonstersKilled(player.monstersKilled)
 }
 
@@ -321,6 +322,8 @@ document.querySelectorAll<HTMLButtonElement>('.shopItem[data-type]').forEach(btn
 function handleShopClick(type: string) {
     switch (type) {
         case 'ammo':
+            shop.buyAmmo(player)
+            updateAmmo(player.ammos)
             break
         case 'fasterShooting':
             shop.buyAmmoSpeed(player)
@@ -334,6 +337,7 @@ function handleShopClick(type: string) {
             break;
     }
     updatePoops(player.money)
+    updateStatsBar()
 }
 
 function updateShopProgressBars(levels: { [type: string]: number }) {

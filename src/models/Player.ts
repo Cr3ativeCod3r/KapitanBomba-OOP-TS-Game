@@ -1,5 +1,6 @@
 import { Bullet } from "./Bullet"
 import { Entity } from "./Entity"
+import { updateAmmo } from "../utils/achievements"
 
 export class Player extends Entity {
     isMoving: boolean = false;
@@ -7,6 +8,7 @@ export class Player extends Entity {
     money: number = 0;
     monstersKilled: number = 0;
     ammoSpeed: number = 5
+    ammos: number = 100
 
     constructor(
         x: number,
@@ -51,20 +53,27 @@ export class Player extends Entity {
         if (this.y + this.h > ctx.height) this.y = ctx.height - this.h;
     }
 
-    fire(): Bullet [] {
-        //animation
-        this.y -= this.speed;
-        setTimeout(() => {
-            this.y += this.speed;
-        }, 100);
+    fire(): Bullet[] {
+        if (this.ammos) {
+            //animation
+            this.y -= this.speed;
+            setTimeout(() => {
+                this.y += this.speed;
+            }, 100);
 
-        //bullet
-        return [
-            // new Bullet(this.x + 100, this.y + 25, 20, 10, this.ammoSpeed),
-            new Bullet(this.x + 100, this.y + 50, 20, 10, this.ammoSpeed),
-            // new Bullet(this.x + 100, this.y + 75, 20, 10, this.ammoSpeed)
-          
-        ];
+            this.ammos-=1
+            //bullet
+            updateAmmo(this.ammos)
+            return [
+                // new Bullet(this.x + 100, this.y + 25, 20, 10, this.ammoSpeed),
+                new Bullet(this.x + 100, this.y + 50, 20, 10, this.ammoSpeed),
+                // new Bullet(this.x + 100, this.y + 75, 20, 10, this.ammoSpeed)
+
+            ];
+
+        }
+
+        return []
     }
 
     addLives(amount: number) {
@@ -75,8 +84,12 @@ export class Player extends Entity {
         this.speed += amount
     }
 
-    addAmmoSpeed(amount: number){
+    addAmmoSpeed(amount: number) {
         this.ammoSpeed += amount
+    }
+
+    addAmmo(amount: number) {
+        this.ammos += amount
     }
 
     spendMoney(amount: number): boolean {

@@ -5,7 +5,7 @@ export class Shop {
     constructor() { }
 
     buyHealth(player: Player): boolean {
-        const cost = 1
+        const cost = 5
         if (player.spendMoney(cost)) {
             player.addLives(1);
             return true;
@@ -24,9 +24,19 @@ export class Shop {
         return false;
     }
 
+     buyAmmo(player: Player): boolean {
+        const cost = 1
+        if (player.spendMoney(cost)) {
+            player.addAmmo(50);
+            return true;
+        }
+        showShopAlert("Nie masz środków!")
+        return false;
+    }
+
 
     buyAmmoSpeed(player: Player): boolean {
-        const cost = 0
+        const cost = 10
         if (player.spendMoney(cost)) {
             player.addAmmoSpeed(1);
             return true;

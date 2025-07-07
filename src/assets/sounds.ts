@@ -4,7 +4,7 @@ export const sounds = {
     over: new Audio(),
 };
 
-const prefix = "dist/sounds/"
+const prefix = "sounds/"
 
 sounds.shot.src = prefix + "shot.mp3";
 sounds.okrzyk.src = prefix + "krzykBomba.mp3";

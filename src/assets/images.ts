@@ -6,7 +6,7 @@ export const images = {
     poop: new Image(),
 };
 
-const prefix = "dist/images/"
+const prefix = "images/"
 
 images.player.src = prefix + "player.png";
 images.enemyKurvinox.src = prefix + "enemyKurvinox.png";

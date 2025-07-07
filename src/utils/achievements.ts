@@ -11,7 +11,7 @@ export function updateLives(lives: number) {
         if (lives <= 0) {
             livesSpace.innerHTML = '';
         } else {
-            livesSpace.innerHTML = Array(lives + 1).join('<img id="hearts" src="dist/images/heart.png" alt="heart">');
+            livesSpace.innerHTML = Array(lives + 1).join('<img id="hearts" src="images/heart.png" alt="heart">');
         }
     }
 }

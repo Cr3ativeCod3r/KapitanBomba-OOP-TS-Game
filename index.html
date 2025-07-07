@@ -14,6 +14,116 @@
         align-items: center;
         background-color: #111;
       }
+      
+      #gameContainer {
+        display: flex;
+        align-items: flex-start;
+        gap: 20px;
+      }
+      
+      #shop {
+        width: 280px;
+        background: linear-gradient(135deg, #1a1a2e, #16213e);
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        border: 2px solid #333;
+        color: #fff;
+        font-family: "Segoe UI", Arial, sans-serif;
+        user-select: none;
+      }
+      
+      #shopTitle {
+        text-align: center;
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 20px;
+        color: #4fc3f7;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        letter-spacing: 1px;
+      }
+      
+      .shopCategory {
+        margin-bottom: 25px;
+      }
+      
+      .categoryTitle {
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: #ffcc02;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      
+      .shopItem {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        padding: 12px;
+        margin-bottom: 8px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        width: 280px;
+      }
+
+      
+      .shopItem:hover {
+        background: rgba(255, 255, 255, 0.15);
+        border-color: #4fc3f7;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(79, 195, 247, 0.3);
+      }
+      
+      .shopItem.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      
+      .shopItem.disabled:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.2);
+        transform: none;
+        box-shadow: none;
+      }
+      
+      .itemInfo {
+        flex: 1;
+      }
+      
+      .itemName {
+        font-size: 0.9rem;
+        font-weight: bold;
+        color: #fff;
+        margin-bottom: 2px;
+      }
+      
+      .itemDescription {
+        font-size: 0.75rem;
+        color: #aaa;
+        line-height: 1.2;
+      }
+      
+      .itemPrice {
+        font-size: 1rem;
+        font-weight: bold;
+        color: #4caf50;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+      }
+      
+      .itemPrice.expensive {
+        color: #f44336;
+      }
+      
+      #mainGameArea {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      
       #hud {
         width: 1000px;
         display: flex;
@@ -31,43 +141,156 @@
         letter-spacing: 1px;
         gap: 60px;
       }
+      
       .stat {
         display: flex;
         align-items: center;
       }
+      
       canvas {
         background: black;
         display: block;
         border-radius: 0 0 12px 12px;
         box-shadow: 0 8px 24px #000a;
       }
-      #hearts{
+      
+      #hearts {
         height: 40px;
       }
-      #score {
+      
+      #score, #poop {
         font-size: 30px;
         font-weight: bold;
       }
+      
+      #poop {
+        margin-right: 40px;
+      }
+      
       #lives {
         display: flex;
         align-items: center;
         min-width: 80px;
         justify-content: center;
       }
+      
+      #controlsInfo {
+        width: 1000px;
+        text-align: center;
+        color: #655555;
+        font-size: 1.05rem;
+        font-family: "Segoe UI", Arial, sans-serif;
+        margin-top: 16px;
+        letter-spacing: 0.5px;
+        opacity: 0.85;
+        user-select: none;
+        text-shadow: 0 1px 4px #000a;
+      }
+      
+      .itemProgress {
+        display: flex;
+        gap: 4px;
+        margin-top: 6px;
+        height: 16px;
+      }
+      .progressSquare {
+        width: 16px;
+        height: 16px;
+        border-radius: 3px;
+        background: #333;
+        border: 1px solid #555;
+        transition: background 0.2s;
+      }
+      .progressSquare.filled {
+        background: #4fc3f7;
+        border-color: #4fc3f7;
+      }
     </style>
-    <script type="module" crossorigin src="/Brakeout-OOP-JS/assets/index-D4qOuFbZ.js"></script>
   </head>
   <body>
-    <div id="hud">
-      <div class="stat" id="scoreBox">
-        <img src="images/score.png" height="40" width="64" style="margin-right: 10px;" />
-        <span id="score" style="font-size: 30px; font-weight: bold;">0</span>
+    <div id="gameContainer">
+      <!-- SKLEP -->
+      <div id="shop">
+        <div id="shopTitle">SKLEP</div>
+        
+        <!-- Amunicja -->
+        <div class="shopCategory">
+          <div class="categoryTitle">🔫 Amunicja</div>
+          
+          <button class="shopItem" data-type="ammo">
+            <div class="itemInfo">
+              <div class="itemName">Dokup amunicji</div>
+              <div class="itemDescription">+50 pocisków</div>
+              <div class="itemProgress" data-type="ammo"></div>
+            </div>
+            <div class="itemPrice" id="ammoPrice">10</div>
+          </button>
+          
+          <button class="shopItem" data-type="fasterShooting">
+            <div class="itemInfo">
+              <div class="itemName">Szybsze strzały</div>
+              <div class="itemDescription">Zwiększa szybkość strzałów</div>
+              <div class="itemProgress" data-type="fasterShooting"></div>
+            </div>
+            <div class="itemPrice" id="fasterShootingPrice">25</div>
+          </button>
+        </div>
+        
+        <!-- Życia -->
+        <div class="shopCategory">
+          <div class="categoryTitle">❤️ Życia</div>
+          
+          <button class="shopItem" data-type="life">
+            <div class="itemInfo">
+              <div class="itemName">Dokup życie +1</div>
+              <div class="itemDescription">Dodatkowe życie</div>
+              <div class="itemProgress" data-type="life"></div>
+            </div>
+            <div class="itemPrice" id="lifePrice">50</div>
+          </button>
+        </div>
+        
+        <!-- Ulepszenia broni -->
+        <div class="shopCategory">
+          <div class="categoryTitle">⚡ Broń</div>
+          
+          <button class="shopItem" data-type="upgradeWeapon">
+            <div class="itemInfo">
+              <div class="itemName">Ulepsz broń</div>
+              <div class="itemDescription">Na lepszą broń</div>
+              <div class="itemProgress" data-type="upgradeWeapon"></div>
+            </div>
+            <div class="itemPrice expensive" id="weaponUpgradePrice">100</div>
+          </button>
+        </div>
+        <div id="shopAlert" style="margin-top: 20px; color: red; font-weight: bold; text-align: center;">
+
+        </div>
       </div>
-      <div class="stat" id="livesBox">
-        <span id="lives"></span>
+
+      <!-- GŁÓWNA GRA -->
+      <div id="mainGameArea">
+        <div id="hud">
+          <div class="stat" id="scoreBox">
+            <img src="images/poop.png" height="40" width="64" style="margin-right: 10px;" />
+            <span id="poop" style="font-size: 30px; font-weight: bold;">0</span>
+
+            <img src="images/score.png" height="40" width="64" style="margin-right: 10px;" />
+            <span id="score" style="font-size: 30px; font-weight: bold;">0</span>
+          </div>
+          <div class="stat" id="livesBox">
+            <span id="lives"></span>
+          </div>
+        </div>
+        
+        <canvas id="canvas" height="600" width="1000"></canvas>
+        
+        <div id="controlsInfo">
+          Sterowanie: <b>WASD</b> lub <b>strzałki</b> &nbsp; | &nbsp; Strzał: <b>E</b>
+        </div>
       </div>
     </div>
     
-    <canvas id="canvas" width="1000" height="500"></canvas>
+    <script type="module" src="/src/game.ts"></script>
   </body>
 </html>

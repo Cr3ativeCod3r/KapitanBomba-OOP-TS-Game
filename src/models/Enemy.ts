@@ -21,27 +21,27 @@ export class Enemy extends Entity {
         this.walkEffect()
     }
 
-    override draw(ctx: CanvasRenderingContext2D): void {
-        ctx.drawImage(this.image, this.x, this.y, this.w, this.h);
+    // override draw(ctx: CanvasRenderingContext2D): void {
+    //     ctx.drawImage(this.image, this.x, this.y, this.w, this.h);
 
-        if (this.damage > 0) {
-            const dotSize = 4;
-            const dotSpacing = 3;
-            const startX = this.x;
-            const startY = this.y - dotSize - 10;
+    //     if (this.damage > 0) {
+    //         const dotSize = 4;
+    //         const dotSpacing = 3;
+    //         const startX = this.x;
+    //         const startY = this.y - dotSize - 10;
 
-            // Rysuj kropki reprezentujące życia
-            for (let i = 0; i < this.lives; i++) {
-                const dotX = startX + i * (dotSize * 2 + dotSpacing);
-                const dotY = startY;
+    //         // Rysuj kropki reprezentujące życia
+    //         for (let i = 0; i < this.lives; i++) {
+    //             const dotX = startX + i * (dotSize * 2 + dotSpacing);
+    //             const dotY = startY;
 
-                ctx.fillStyle = 'red';
-                ctx.beginPath();
-                ctx.arc(dotX + dotSize, dotY + dotSize, dotSize, 0, Math.PI * 2);
-                ctx.fill();
-            }
-        }
-    }
+    //             ctx.fillStyle = 'red';
+    //             ctx.beginPath();
+    //             ctx.arc(dotX + dotSize, dotY + dotSize, dotSize, 0, Math.PI * 2);
+    //             ctx.fill();
+    //         }
+    //     }
+    // }
 
 
 }

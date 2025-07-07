@@ -6,8 +6,10 @@ export const images = {
     poop: new Image(),
 };
 
-images.player.src = "images/player.png";
-images.enemyKurvinox.src = "images/enemyKurvinox.png";
-images.galaktyka.src = "images/galaktyka.png";
-images.poop.src = "images/poop.png";
+const prefix = "dist/images/"
+
+images.player.src = prefix + "player.png";
+images.enemyKurvinox.src = prefix + "enemyKurvinox.png";
+images.galaktyka.src = prefix + "galaktyka.png";
+images.poop.src = prefix + "poop.png";
 

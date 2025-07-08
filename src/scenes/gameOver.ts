@@ -1,39 +1,63 @@
-export const restartButton = {
-    x: 0,
-    y: 0,
-    w: 300,
-    h: 60
-};
+import * as PIXI from 'pixi.js';
+import { playSound } from '../utils/soundPlayer'
 
-export function drawGameOverScreen(ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, points: number) {
-    ctx.save();
-    ctx.globalAlpha = 0.7;
-    ctx.fillStyle = "#000";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.restore();
+export function drawGameOverWithPixi(
+  app: PIXI.Application,
+  gameContainer: PIXI.Container,
+  player: { monstersKilled: number },
+  restartGameCallback: () => void
+): void {
+  playSound("over");
 
+  const overlay = new PIXI.Graphics();
+  overlay.beginFill(0x000000, 0.7);
+  overlay.drawRect(0, 0, app.screen.width, app.screen.height);
+  overlay.endFill();
 
-    ctx.fillStyle = "#fff";
-    ctx.font = "bold 64px Arial";
-    ctx.textAlign = "center";
-    ctx.fillText("GAME OVER!", canvas.width / 2, canvas.height / 2 - 60);
+  const gameOverText = new PIXI.Text('GAME OVER', {
+    fontFamily: 'Arial',
+    fontSize: 48,
+    fill: 0xffffff,
+    align: 'center'
+  });
+  gameOverText.x = app.screen.width / 2;
+  gameOverText.y = app.screen.height / 2 - 100;
+  gameOverText.anchor.set(0.5);
 
+  const scoreText = new PIXI.Text(`Monsters Killed: ${player.monstersKilled}`, {
+    fontFamily: 'Arial',
+    fontSize: 24,
+    fill: 0xffffff,
+    align: 'center'
+  });
+  scoreText.x = app.screen.width / 2;
+  scoreText.y = app.screen.height / 2 - 50;
+  scoreText.anchor.set(0.5);
 
-    ctx.font = "bold 32px Arial";
-    ctx.fillText(`Ustrzelone kurwinoxy: ${points}`, canvas.width / 2, canvas.height / 2 - 10);
+  const restartButton = new PIXI.Graphics();
+  restartButton.beginFill(0x00ff00);
+  restartButton.drawRoundedRect(0, 0, 200, 50, 10);
+  restartButton.endFill();
+  restartButton.x = app.screen.width / 2 - 100;
+  restartButton.y = app.screen.height / 2 + 30;
+  restartButton.interactive = true;
+  restartButton.cursor = 'pointer';
 
+  const restartText = new PIXI.Text('RESTART GAME', {
+    fontFamily: 'Arial',
+    fontSize: 20,
+    fill: 0x000000,
+    align: 'center'
+  });
+  restartText.x = 100;
+  restartText.y = 25;
+  restartText.anchor.set(0.5);
 
-    restartButton.x = canvas.width / 2 - restartButton.w / 2;
-    restartButton.y = canvas.height / 2 + 30;
+  restartButton.addChild(restartText);
+  restartButton.on('pointerdown', restartGameCallback);
 
-
-    ctx.fillStyle = "yellow";
-    ctx.strokeStyle = "#fff";
-    ctx.lineWidth = 4;
-    ctx.fillRect(restartButton.x, restartButton.y, restartButton.w, restartButton.h);
-    ctx.strokeRect(restartButton.x, restartButton.y, restartButton.w, restartButton.h);
-
-    ctx.fillStyle = "#222";
-    ctx.font = "bold 32px Arial";
-    ctx.fillText("start", canvas.width / 2, restartButton.y + restartButton.h / 2 + 12);
+  gameContainer.addChild(overlay);
+  gameContainer.addChild(gameOverText);
+  gameContainer.addChild(scoreText);
+  gameContainer.addChild(restartButton);
 }

@@ -24,7 +24,7 @@ export class Shop {
         return false;
     }
 
-     buyAmmo(player: Player): boolean {
+    buyAmmo(player: Player): boolean {
         const cost = 1
         if (player.spendMoney(cost)) {
             player.addAmmo(50);
